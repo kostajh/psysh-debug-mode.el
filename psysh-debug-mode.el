@@ -73,15 +73,14 @@
   (interactive)
   (let ((trace (concatenate 'string "require_once '" psysh-debug-bin-path "'; Psy\\Shell::debug(" psysh-debug-default-object ");"))
         (line (thing-at-point 'line)))
-    ;; FIXME: The string-match toggle doesn't work.
     (if (and line (string-match "Shell::debug" line))
-        (kill-whole-line))
+        (kill-whole-line)
       (progn
         (back-to-indentation)
         (insert trace)
         (insert "\n")
         (highlight-lines-matching-regexp "Shell::debug")
-        )))
+        ))))
 
 (defun psysh-debug--clear-all-breakpoints()
   "Clear all breakpoints from active buffer."
