@@ -27,14 +27,14 @@
 
 ;;; Commentary:
 
-;;; This library provides a minor mode for inserting psysh debug breakpoints.
+;;; This library provides a minor mode for debugging PHP scripts with Psysh.
 
 ;;; Code:
 
 (require 'thingatpt)
 
 (defgroup psysh-debug nil
-  "Debug PHP code with Psysh"
+  "Debug PHP scripts with Psysh"
   :group 'tools
   :group 'convenience)
 
@@ -65,7 +65,7 @@
 
 ;;;###autoload
 (define-minor-mode psysh-debug-mode
-  "Minor mode to debug PHP apps with Psysh"
+  "Minor mode to debug PHP scripts with Psysh"
   nil " Psysh debug" psysh-debug-mode-map)
 
 (defun psysh-debug--toggle-breakpoint()
@@ -73,18 +73,21 @@
   (interactive)
   (let ((trace (concatenate 'string "require_once '" psysh-debug-bin-path "'; Psy\\Shell::debug(" psysh-debug-default-object ");"))
         (line (thing-at-point 'line)))
-    (if (and line (string-match trace line))
+    ;; FIXME: The string-match toggle doesn't work.
+    (if (and line (string-match "Shell::debug" line))
         (kill-whole-line))
       (progn
         (back-to-indentation)
-        (insert-string trace)
-        (insert-string "\n")
+        (insert trace)
+        (insert "\n")
+        (highlight-lines-matching-regexp "Shell::debug")
         )))
 
 (defun psysh-debug--clear-all-breakpoints()
   "Clear all breakpoints from active buffer."
   (interactive)
-  (flush-lines "Psy\\Shell")
+  ;; TODO: Retain cursor position.
+  (delete-matching-lines "Shell::debug" (beginning-of-buffer))
   )
 
 (provide 'psysh-debug-mode)
